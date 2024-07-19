@@ -6,20 +6,18 @@
  */
 function getPokemon(id) {
 	const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
-	console.log(url);
-	// return fetchData(url).then((data) => {
-	// 	if (!data) return;
-
-	// 	return {
-	// 		name: data.name,
-	// 		img: data.img,
-	// 		height: data.height,
-	// 		weight: data.weight,
-	// 		types: data.type,
-	// 		abilities: data.abilities,
-	// 		moves: data.moves
-	// 	};
-	// });
+	return fetchData(url).then(async (data) => {
+		if (!data) return;
+		return {
+			name: data.name,
+			img: data.sprites.front_default,
+			height: data.height,
+			weight: data.weight,
+			types: await getPokemonTypes(data),
+			//   abilities: data.abilities,
+			//   moves: data.moves,
+		};
+	});
 }
 
 /**
@@ -30,20 +28,14 @@ function getPokemon(id) {
  */
 
 function getPokemonTypes(pokemon) {
-	const typesPromises = pokemon.types.map( async(type) => {
+	const typesPromises = pokemon.types.map(async (type) => {
 		const url = type.type.url;
 		return fetchData(url).then((data) => {
 			// TODO buscar el elemento (idioma) "es" en lo que retorna
-			return data.names.find(name => name.language.name === "es");
+			return data.names.find((name) => name.language.name === "es").name;
 		});
 	});
-
-	pokemon.types = [];
-	return Promise.all(typesPromises)
-		.then((types) => {
-			pokemon.types.push(types.name);
-		return pokemon;
-	});
+	return Promise.all(typesPromises);
 }
 
 /**
@@ -52,17 +44,16 @@ function getPokemonTypes(pokemon) {
  * @returns {Promise<Awaited<unknown>[]>}
  */
 function getPokemonAbilities(pokemon) {
-	const abilitiesPromises = pokemon.abilities.map(async(ability) => {
+	const abilitiesPromises = pokemon.abilities.map(async (ability) => {
 		const url = ability.ability.url;
 
 		return fetchData(url).then((data) => {
-			return data.names.find(name => name.language.name === "es");
+			return data.names.find((name) => name.language.name === "es");
 		});
 	});
 
 	pokemon.abilities = [];
-	return Promise.all(abilitiesPromises)
-	.then((abilities) => {
+	return Promise.all(abilitiesPromises).then((abilities) => {
 		pokemon.abilities.push(abilities);
 		return pokemon;
 	});
@@ -100,10 +91,10 @@ function getPokemonMoves(pokemon) {
 		}, Promise.resolve([]))
 		.then((results) => {
 			pokemon.moves = results.map((result) => {
-				if (result.status === 'fulfilled') {
+				if (result.status === "fulfilled") {
 					return result.value;
 				} else {
-					return 'Nombre no encontrado';
+					return "Nombre no encontrado";
 				}
 			});
 
@@ -117,8 +108,8 @@ function getPokemonMoves(pokemon) {
  * @param pokemon
  */
 function renderPokemon(pokemon) {
-	const List = document.getElementById('list');
-	const pokemonLi = document.createElement('li');
+	const List = document.getElementById("list");
+	const pokemonLi = document.createElement("li");
 	pokemon.notFound
 		? (pokemonLi.innerHTML = `<h3>${pokemon.notFound}</h3>`)
 		: (pokemonLi.innerHTML = `
@@ -127,9 +118,7 @@ function renderPokemon(pokemon) {
 			<p><b>Image: </b>${pokemon.img}</p>
 			<p><b>Height: </b>${pokemon.height}</p>
 			<p><b>Weight: </b>${pokemon.weight}</p>
-			<p><b>Types: </b>${pokemon.types.join(', ')}</p>
-			<p><b>Abilities: </b>${pokemon.abilities.join(', ')}</p>
-			<p><b>Moves: </b>${pokemon.moves.join(', ')}</p>
+			<p><b>Types: </b>${pokemon.types.join(", ")}</p>			
     `);
 	List.appendChild(pokemonLi);
 }
@@ -173,21 +162,22 @@ function renderArrayItems(ids) {
 
 	// validacion de que sea un array
 	if (!Array.isArray(ids)) {
-		console.log('Does not a valid array');
+		console.log("Does not a valid array");
 		return;
 	}
 
 	// iteracion por cada id enviado
-	const pokemonPromises = ids.map(id => 
+	const pokemonPromises = ids.map((id) =>
 		getPokemon(id)
 			.then((response) => {
-				if(response.ok){
-					return response.json();
+				if (response.name) {
+					return response;
 				} else {
 					throw new Error(`Pokemon with ID ${id} not found`);
 				}
 			})
 			.catch((error) => {
+				console.error(error);
 				// TODO ante error o no found saldra por aqui
 				// TODO retornar un objeto con notFound con na string que diga cual es el pokemon no encontrado
 				return { notFound: `Pokemon with ID ${id} not found`, error: error.message };
@@ -195,13 +185,12 @@ function renderArrayItems(ids) {
 	);
 
 	Promise.all(pokemonPromises)
-		.then((pokemon) => {
-			console.log(pokemon);
-			// renderPokemon(pokemon);
+		.then((pokemons) => {
+			pokemons.forEach((pokemon) => renderPokemon(pokemon));
 		})
 		.catch((error) => {
-			console.log('Error fetching data:', error.message);
-		})
+			console.log("Error fetching data:", error.message);
+		});
 }
 
 /**
@@ -209,7 +198,7 @@ function renderArrayItems(ids) {
  */
 
 function renderItems() {
-	let value = document.getElementById('searchValue').value;
+	let value = document.getElementById("searchValue").value;
 	let splittedValues = value.split(",");
 	renderArrayItems(splittedValues);
 }
@@ -219,7 +208,7 @@ function renderItems() {
  */
 
 function clearSearchInput() {
-	let searchInput = document.getElementById('searchValue');
+	let searchInput = document.getElementById("searchValue");
 	searchInput.value = "";
 }
 
@@ -229,13 +218,13 @@ function clearSearchInput() {
  * agregar el evento `click` a los botones usando `addEventListener`
  */
 function init() {
-	const SEARCH_BTN = document.getElementById('search');
-	const RANDOM_BTN = document.getElementById('random');
-	const CLEAR_BTN = document.getElementById('clear');
+	const SEARCH_BTN = document.getElementById("search");
+	const RANDOM_BTN = document.getElementById("random");
+	const CLEAR_BTN = document.getElementById("clear");
 
-	SEARCH_BTN.addEventListener('click', renderItems);
-	RANDOM_BTN.addEventListener('click', renderItems);
-	CLEAR_BTN.addEventListener('click', clearSearchInput);
+	SEARCH_BTN.addEventListener("click", renderItems);
+	RANDOM_BTN.addEventListener("click", renderItems);
+	CLEAR_BTN.addEventListener("click", clearSearchInput);
 }
 
 // hack for hackerearth, no dispara evento DOMContentLoaded or load
@@ -243,4 +232,4 @@ function init() {
 // 	init();
 // }, 200)
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener("DOMContentLoaded", init);
