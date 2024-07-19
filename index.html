@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Prueba técnica Pokémon - Globant</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="src/styles.css">
+</head>
+<body>
+    <main>
+        <section id="app">
+            <form action="pokemonForm">
+                <input type="text" name="searchValue" id="searchValue" value="1,2">
+                <button type="button" id="search">Buscar</button>
+                <button type="button" id="random">Random</button>
+                <button type="button" id="clear">Limpiar</button>
+            </form>
+
+            <br>
+            
+            <div>
+                <b>Resultado:</b>
+            </div>
+
+            <div id="list"></div>
+        </section>
+    </main>
+
+    <section id="loader" class="loader">
+        <p>Loading</p>
+    </section>
+
+    <script src="src/index.js"></script>
+</body>
+</html>
