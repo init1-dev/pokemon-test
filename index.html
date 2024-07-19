@@ -7,17 +7,23 @@
     <link rel="stylesheet" type="text/css" href="src/styles.css">
 </head>
 <body>
+    <header>
+        <form id="pokemonForm">
+            <input 
+                type="text" 
+                name="searchValue" 
+                id="searchValue" 
+                value=""
+                placeholder="Search Pokémons"
+            >
+            <button type="button" id="search">Buscar</button>
+            <button type="button" id="random">Random</button>
+            <button type="button" id="clear">Limpiar</button>
+        </form>
+    </header>
+
     <main>
         <section id="app">
-            <form action="pokemonForm">
-                <input type="text" name="searchValue" id="searchValue" value="1,2">
-                <button type="button" id="search">Buscar</button>
-                <button type="button" id="random">Random</button>
-                <button type="button" id="clear">Limpiar</button>
-            </form>
-
-            <br>
-            
             <div>
                 <b>Resultado:</b>
             </div>
@@ -26,9 +32,7 @@
         </section>
     </main>
 
-    <section id="loader" class="loader">
-        <p>Loading</p>
-    </section>
+    <section id="loader" class="loader"></section>
 
     <script src="src/index.js"></script>
 </body>

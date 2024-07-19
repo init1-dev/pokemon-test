@@ -14,8 +14,8 @@ function getPokemon(id) {
 			height: data.height,
 			weight: data.weight,
 			types: await getPokemonTypes(data),
-			//   abilities: data.abilities,
-			//   moves: data.moves,
+			// abilities: await getPokemonAbilities(data),
+			// moves: await getPokemonMoves(data),
 		};
 	});
 }
@@ -110,16 +110,20 @@ function getPokemonMoves(pokemon) {
 function renderPokemon(pokemon) {
 	const List = document.getElementById("list");
 	const pokemonLi = document.createElement("li");
+	
 	pokemon.notFound
 		? (pokemonLi.innerHTML = `<h3>${pokemon.notFound}</h3>`)
 		: (pokemonLi.innerHTML = `
-			// TODO agregar name e imagen
-			<p><b>Name: </b>${pokemon.name}</p>
-			<p><b>Image: </b>${pokemon.img}</p>
-			<p><b>Height: </b>${pokemon.height}</p>
-			<p><b>Weight: </b>${pokemon.weight}</p>
-			<p><b>Types: </b>${pokemon.types.join(", ")}</p>			
-    `);
+			<div class="card">
+				<p><b>Name: </b>${pokemon.name}</p>
+				<img src="${pokemon.img}" />
+				<p><b>Height: </b>${pokemon.height}kg</p>
+				<p><b>Weight: </b>${pokemon.weight}cm</p>
+				<p><b>Types: </b> <span class="type ${'type'}">${pokemon.types.join(", ")}</span></p>
+			<div>
+		`);
+			// <p><b>Types: </b>${pokemon.abilities.join(", ")}</p>			
+			// <p><b>Types: </b>${pokemon.moves.join(", ")}</p>
 	List.appendChild(pokemonLi);
 }
 
@@ -145,7 +149,14 @@ function fetchData(url) {
  * @param max
  * @returns {*}
  */
-function getRandomNumber(min, max) {
+function getRandomNumber(min, max, number) {
+	if(number){
+		let randomNumbers = [];
+		for (let index = 0; index < 4; index++) {
+			randomNumbers.push(Math.floor(Math.random() * (max - min + 1) + min));
+		}
+		return randomNumbers;
+	}
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
@@ -187,6 +198,7 @@ function renderArrayItems(ids) {
 	Promise.all(pokemonPromises)
 		.then((pokemons) => {
 			pokemons.forEach((pokemon) => renderPokemon(pokemon));
+			setLoading(false);
 		})
 		.catch((error) => {
 			console.log("Error fetching data:", error.message);
@@ -194,10 +206,42 @@ function renderArrayItems(ids) {
 }
 
 /**
+ * funcion para limpiar el campo `searchValue`
+ */
+
+function clearLastResults() {
+	let listContent = document.getElementById("list");
+	console.log(listContent);
+	listContent.innerHTML = '';
+}
+
+/**
+ * funcion para establecer el estado de loading
+ */
+
+function setLoading(value) {
+	const loader = document.getElementById('loader');
+	if(value){
+		loader.classList.add('visible');
+	} else {
+		loader.classList.remove('visible');
+	}
+}
+
+/**
  * funcion principal de render usando el campo de texto `searchValue`
  */
 
-function renderItems() {
+function renderItems(random = false) {
+	setLoading(true);
+	clearLastResults()
+
+	if(random){
+		const randomIds = getRandomNumber(1, 1302, 4);
+		console.log(randomIds);
+		return renderArrayItems(randomIds);
+	}
+
 	let value = document.getElementById("searchValue").value;
 	let splittedValues = value.split(",");
 	renderArrayItems(splittedValues);
@@ -208,8 +252,10 @@ function renderItems() {
  */
 
 function clearSearchInput() {
-	let searchInput = document.getElementById("searchValue");
-	searchInput.value = "";
+	let form = document.getElementById("pokemonForm");
+	let list = document.getElementById("list");
+	form.reset();
+	list.innerHTML = "";
 }
 
 /**
@@ -221,15 +267,15 @@ function init() {
 	const SEARCH_BTN = document.getElementById("search");
 	const RANDOM_BTN = document.getElementById("random");
 	const CLEAR_BTN = document.getElementById("clear");
+	const FORM = document.getElementById("pokemonForm");
 
-	SEARCH_BTN.addEventListener("click", renderItems);
-	RANDOM_BTN.addEventListener("click", renderItems);
+	SEARCH_BTN.addEventListener("click", () => renderItems());
+	RANDOM_BTN.addEventListener("click", () => renderItems(true));
 	CLEAR_BTN.addEventListener("click", clearSearchInput);
+	FORM.addEventListener("submit", (e) => {
+		e.preventDefault();
+		renderItems();
+	});
 }
-
-// hack for hackerearth, no dispara evento DOMContentLoaded or load
-// setTimeout(()=>{
-// 	init();
-// }, 200)
 
 document.addEventListener("DOMContentLoaded", init);
