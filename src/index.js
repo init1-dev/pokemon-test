@@ -6,16 +6,16 @@
  */
 function getPokemon(id) {
 	const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
-	return fetchData(url).then(async (data) => {
+	return fetchData(url).then((data) => {
 		if (!data) return;
 		return {
 			name: data.name,
 			img: data.sprites.front_default,
 			height: data.height,
 			weight: data.weight,
-			types: await getPokemonTypes(data),
-			// abilities: await getPokemonAbilities(data),
-			// moves: await getPokemonMoves(data),
+			types: data.types,
+			abilities: data.abilities,
+			moves: data.moves,
 		};
 	});
 }
@@ -48,15 +48,11 @@ function getPokemonAbilities(pokemon) {
 		const url = ability.ability.url;
 
 		return fetchData(url).then((data) => {
-			return data.names.find((name) => name.language.name === "es");
+			return data.names.find((name) => name.language.name === "es").name;
 		});
 	});
 
-	pokemon.abilities = [];
-	return Promise.all(abilitiesPromises).then((abilities) => {
-		pokemon.abilities.push(abilities);
-		return pokemon;
-	});
+	return Promise.all(abilitiesPromises);
 }
 
 /**
@@ -67,10 +63,11 @@ function getPokemonAbilities(pokemon) {
  */
 
 function getPokemonMoves(pokemon) {
-	const movesPromises = pokemon.moves.map((move) => {
+	const movesPromises = pokemon.moves.map( async(move) => {
 		const url = move.move.url;
 		return fetchData(url).then((data) => {
 			// TODO buscar el elemento (idioma) "es" en lo que retorna. Si no existe, buscar el elemento (idioma) "en"
+			return data.names.find((name) => name.language.name === "es").name;
 		});
 	});
 
@@ -90,7 +87,7 @@ function getPokemonMoves(pokemon) {
 			});
 		}, Promise.resolve([]))
 		.then((results) => {
-			pokemon.moves = results.map((result) => {
+			const moves = results.map((result) => {
 				if (result.status === "fulfilled") {
 					return result.value;
 				} else {
@@ -98,7 +95,7 @@ function getPokemonMoves(pokemon) {
 				}
 			});
 
-			return pokemon;
+			return moves;
 		});
 }
 
@@ -120,10 +117,10 @@ function renderPokemon(pokemon) {
 				<p><b>Height: </b>${pokemon.height}kg</p>
 				<p><b>Weight: </b>${pokemon.weight}cm</p>
 				<p><b>Types: </b> <span class="type ${'type'}">${pokemon.types.join(", ")}</span></p>
+				<p><b>Abilities: </b>${pokemon.abilities.join(", ")}</p>
+				<p><b>Moves: </b>${pokemon.moves.join(", ")}</p>
 			<div>
 		`);
-			// <p><b>Types: </b>${pokemon.abilities.join(", ")}</p>			
-			// <p><b>Types: </b>${pokemon.moves.join(", ")}</p>
 	List.appendChild(pokemonLi);
 }
 
@@ -133,7 +130,7 @@ function renderPokemon(pokemon) {
  * @param url
  * @returns {Promise<any>}
  */
-function fetchData(url) {
+async function fetchData(url) {
 	return fetch(url)
 		.then((response) => response.json())
 		.catch((error) => {
@@ -182,15 +179,17 @@ function renderArrayItems(ids) {
 	// iteracion por cada id enviado
 	const pokemonPromises = ids.map((id) =>
 		getPokemon(id)
-			.then((response) => {
+			.then(async (response) => {
 				if (response.name) {
+					response.types = await getPokemonTypes(response);
+					response.abilities = await getPokemonAbilities(response);
+					response.moves = await getPokemonMoves(response);
 					return response;
 				} else {
 					throw new Error(`Pokemon with ID ${id} not found`);
 				}
 			})
 			.catch((error) => {
-				console.error(error);
 				// TODO ante error o no found saldra por aqui
 				// TODO retornar un objeto con notFound con na string que diga cual es el pokemon no encontrado
 				return { notFound: `Pokemon with ID ${id} not found`, error: error.message };
