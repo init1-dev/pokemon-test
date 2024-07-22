@@ -33,7 +33,61 @@
 
     <main>
         <section id="app">
-            <div>
+            <div id="explain">
+                <h2>Buscador de Pokémons:</h2>
+
+                <p>Esta sencilla aplicación consiste en un buscador de Pokémons que utiliza la API de PokeApi para servir datos.</p>
+
+                <h4>Cómo usar:</h4>
+
+                <p>Hay varias maneras de realizar búsquedas:</p>
+                
+                <ul>
+                    <li>
+                        <strong>Buscar por id de Pokémon. </strong>(Ejemplo: 1)
+                    </li>
+
+                    <li>
+                        <strong>Buscar por nombre de Pokémon. </strong>(Ejemplo: pikachu)
+                    </li>
+
+                    <li>
+                        <strong>Búsqueda múltiple por id o nombre, separados por comas ",": </strong>(Ejemplo: 1,2,pikachu,150,151)
+                    </li>
+
+                    <li>
+                        <strong>Búsqueda random: </strong>Buscará y mostrará 4 Pokémons aleatorios entre todos los posibles.
+                    </li>
+
+                    <li>
+                        <strong>Agregar: </strong>En lugar de realizar una nueva búsqueda podrás mantener la actual y agregar nuevas búsquedas a la misma para no perder los datos anteriores.
+                    </li>
+                </ul>
+
+                <h4>Atajos de teclado:</h4>
+
+                <p>Existen ciertos atajos de teclado que podrás utilizar cuando tengas el foco activo en la barra de búsqueda:</p>
+
+                <ul>
+                    <li>
+                        <strong>ENTER: </strong>Realizará la búsqueda actual, eliminando cualquier resultado anterior.
+                    </li>
+
+                    <li>
+                        <strong>SHIFT + ENTER: </strong>Añadirá la búsqueda actual a la búsqueda anterior, manteniendo todos los resultados.
+                    </li>
+
+                    <li>
+                        <strong>CTRL + X: </strong>Será el equivalente de utilizar el botón "limpiar", borrará los resultados anteriores, así como la query actual en el input de búsqueda.
+                    </li>
+
+                    <li>
+                        <strong>ESC: </strong>Borrará la query actual en la barra de búsqueda.
+                    </li>
+                </ul>
+            </div>
+
+            <div id="results" class="hidden">
                 <b>Resultado:</b>
             </div>
 

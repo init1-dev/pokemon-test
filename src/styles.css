@@ -33,6 +33,16 @@ li {
     text-align: center;
 }
 
+#explain {
+    ul {
+
+        li {
+            text-align: start;
+            list-style: circle;
+        }
+    }
+}
+
 .card {
     padding: 0.5rem;
     border-radius: 0.5rem;

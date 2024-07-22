@@ -18,7 +18,7 @@ function getPokemon(id) {
 			moves: data.moves,
 		};
 	});
-}
+};
 
 /**
  * Obtener tipos del pokemon enviado
@@ -36,7 +36,7 @@ function getPokemonTypes(pokemon) {
 		});
 	});
 	return Promise.all(typesPromises);
-}
+};
 
 /**
  * obtener habilidades del pokemon enviado
@@ -53,7 +53,7 @@ function getPokemonAbilities(pokemon) {
 	});
 
 	return Promise.all(abilitiesPromises);
-}
+};
 
 /**
  * Obtener movimientos del pokemon enviado
@@ -97,7 +97,7 @@ function getPokemonMoves(pokemon) {
 
 			return moves;
 		});
-}
+};
 
 /**
  * Render de informacion del pokemon en el dom
@@ -122,7 +122,7 @@ function renderPokemon(pokemon) {
 			<div>
 		`);
 	List.appendChild(pokemonLi);
-}
+};
 
 /**
  * Se recomienda el uso de esta utilidad en vez de fetch directo
@@ -137,7 +137,7 @@ async function fetchData(url) {
 			console.log(`Error fetching data: ${error}`);
 			throw error;
 		});
-}
+};
 
 /**
  * Función para obtener enteros randoms basado en un rango de numeros
@@ -157,7 +157,7 @@ function getRandomNumber(min, max, number) {
 		return Array.from(uniqueNumbers);
 	}
 	return Math.floor(Math.random() * (max - min + 1) + min);
-}
+};
 
 /**
  * Funcion de renders de items enviados por parametros (array de ids)
@@ -204,7 +204,7 @@ function renderArrayItems(ids) {
 		.catch((error) => {
 			console.log("Error fetching data:", error.message);
 		});
-}
+};
 
 /**
  * funcion para limpiar el campo `searchValue`
@@ -213,7 +213,7 @@ function renderArrayItems(ids) {
 function clearLastResults() {
 	let listContent = document.getElementById("list");
 	listContent.innerHTML = '';
-}
+};
 
 /**
  * funcion para establecer el estado de loading
@@ -226,7 +226,7 @@ function setLoading(value) {
 	} else {
 		loader.classList.remove('visible');
 	}
-}
+};
 
 /**
  * funcion para obtener valores separados por coma y limpiar vacíos
@@ -236,13 +236,14 @@ function getCommaSeparatedValues(stringValues) {
 	if(stringValues) {
 		return stringValues.split(",").filter(val => val.trim() !== "");
 	}
-}
+};
 
 /**
  * funcion principal de render usando el campo de texto `searchValue`
  */
 
 function renderItems({random = false, add = false} = {}) {
+	toggleExplain();
 	setLoading(true);
 
 	if(!add){
@@ -262,7 +263,7 @@ function renderItems({random = false, add = false} = {}) {
 	} else {
 		setLoading(false);
 	}
-}
+};
 
 /**
  * funcion para resetear el formulario y limpiar resultados
@@ -273,7 +274,8 @@ function resetFormAndClean() {
 	form.reset();
 	toggleClearButton();
 	clearLastResults();
-}
+	toggleExplain();
+};
 
 /**
  * funcion que establece el focus en el input especificado
@@ -283,7 +285,7 @@ function inputFocus(inputName) {
 	if(inputName){
 		document.getElementById(inputName).focus();
 	}
-}
+};
 
 /**
  * funcion que establece la visibilidad del botton clearButton
@@ -293,7 +295,7 @@ function toggleClearButton() {
     const input = document.getElementById('searchValue');
     const clearButton = document.getElementById('clearButton');
     clearButton.style.display = input.value ? 'block' : 'none';
-}
+};
 
 /**
  * funcion que limpia `searchValue`
@@ -304,7 +306,18 @@ function clearInput() {
     SEARCH_INPUT.value = '';
     toggleClearButton();
 	SEARCH_INPUT.focus();
-}
+};
+
+/**
+ * alterna entre la explicacion y la lista de resultados
+ */
+
+function toggleExplain() {
+	const RESULTS = document.getElementById('results');
+	const EXPLAIN = document.getElementById('explain');
+	RESULTS.classList.toggle('hidden');
+	EXPLAIN.classList.toggle('hidden');
+};
 
 /**
  * iniciacion de app
@@ -349,6 +362,6 @@ function init() {
 		e.preventDefault();
 		renderItems();
 	});
-}
+};
 
 document.addEventListener("DOMContentLoaded", init);
