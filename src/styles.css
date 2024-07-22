@@ -69,6 +69,88 @@ li {
         l7-2 2s infinite linear;
 }
 
+form#pokemonForm {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.inputWrapper {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 50%;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 0.5rem 1.5rem 0.5rem 0.5rem;
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+}
+
+.clearBtn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgb(70, 70, 70);
+    cursor: pointer;
+    font-weight: 900;
+    line-height: 1;
+    display: none;
+}
+
+.buttonGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+form#pokemonForm button {
+    flex: 1 1 auto;
+    padding: 0.5rem;
+    border: unset;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    min-width: 2.5rem;
+}
+
+.primary, .success, .secondary, .info, .danger {
+    color: white;
+    filter: drop-shadow(rgba(0, 0, 0, 0.6) 1px 1px 1px);
+}
+
+.primary {
+    background-color: #007bff;
+}
+
+.success {
+    background-color: #28a745;
+}
+
+.secondary {
+    background-color: #6c757d;
+}
+
+.info {
+    background-color: #17a2b8;
+}
+
+.danger {
+    background-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    form#pokemonForm {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
 @keyframes l7-1 {
 
     0%,

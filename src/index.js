@@ -151,11 +151,13 @@ function fetchData(url) {
  */
 function getRandomNumber(min, max, number) {
 	if(number){
-		let randomNumbers = [];
-		for (let index = 0; index < 4; index++) {
-			randomNumbers.push(Math.floor(Math.random() * (max - min + 1) + min));
+		const uniqueNumbers = new Set();
+
+		while (uniqueNumbers.size < number) {
+			const randomNumber = Math.floor(Math.random() * (max - min + 1) + min);
+			uniqueNumbers.add(randomNumber);
 		}
-		return randomNumbers;
+		return Array.from(uniqueNumbers);
 	}
 	return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -211,7 +213,6 @@ function renderArrayItems(ids) {
 
 function clearLastResults() {
 	let listContent = document.getElementById("list");
-	console.log(listContent);
 	listContent.innerHTML = '';
 }
 
@@ -229,33 +230,81 @@ function setLoading(value) {
 }
 
 /**
- * funcion principal de render usando el campo de texto `searchValue`
+ * funcion para obtener valores separados por coma y limpiar vacíos
  */
 
-function renderItems(random = false) {
-	setLoading(true);
-	clearLastResults()
-
-	if(random){
-		const randomIds = getRandomNumber(1, 1302, 4);
-		console.log(randomIds);
-		return renderArrayItems(randomIds);
+function getCommaSeparatedValues(stringValues) {
+	if(stringValues) {
+		return stringValues.split(",").filter(val => val.trim() !== "");
 	}
-
-	let value = document.getElementById("searchValue").value;
-	let splittedValues = value.split(",");
-	renderArrayItems(splittedValues);
 }
 
 /**
- * funcion para limpiar el campo `searchValue`
+ * funcion principal de render usando el campo de texto `searchValue`
  */
 
-function clearSearchInput() {
+function renderItems({random = false, add = false} = {}) {
+	setLoading(true);
+
+	if(!add){
+		clearLastResults();
+	}
+
+	if(random){
+		const randomIds = getRandomNumber(1, 1302, 4);
+		return renderArrayItems(randomIds);
+	}
+
+	let values = document.getElementById("searchValue").value;
+	
+	if(values) {
+		let splittedValues = getCommaSeparatedValues(values);
+		renderArrayItems(splittedValues);
+	} else {
+		setLoading(false);
+	}
+}
+
+/**
+ * funcion para resetear el formulario y limpiar resultados
+ */
+
+function resetFormAndClean() {
 	let form = document.getElementById("pokemonForm");
-	let list = document.getElementById("list");
 	form.reset();
-	list.innerHTML = "";
+	toggleClearButton();
+	clearLastResults();
+}
+
+/**
+ * funcion que establece el focus en el input especificado
+ */
+
+function inputFocus(inputName) {
+	if(inputName){
+		document.getElementById(inputName).focus();
+	}
+}
+
+/**
+ * funcion que establece la visibilidad del botton clearButton
+ */
+
+function toggleClearButton() {
+    const input = document.getElementById('searchValue');
+    const clearButton = document.getElementById('clearButton');
+    clearButton.style.display = input.value ? 'block' : 'none';
+}
+
+/**
+ * funcion que limpia `searchValue`
+ */
+
+function clearInput() {
+	const SEARCH_INPUT = document.getElementById('searchValue');
+    SEARCH_INPUT.value = '';
+    toggleClearButton();
+	SEARCH_INPUT.focus();
 }
 
 /**
@@ -264,14 +313,39 @@ function clearSearchInput() {
  * agregar el evento `click` a los botones usando `addEventListener`
  */
 function init() {
+	const SEARCH_INPUT = document.getElementById("searchValue");
 	const SEARCH_BTN = document.getElementById("search");
+	const CLEAN_BTN = document.getElementById("clearButton");
+	const ADD_BTN = document.getElementById("add");
 	const RANDOM_BTN = document.getElementById("random");
 	const CLEAR_BTN = document.getElementById("clear");
 	const FORM = document.getElementById("pokemonForm");
 
+	inputFocus("searchValue");
+	toggleClearButton();
+
+	SEARCH_INPUT.addEventListener("input", toggleClearButton);
+	SEARCH_INPUT.addEventListener("keydown", (e) => {
+		if(e.key === 'Escape') {
+			clearInput();
+		} else if(e.key === 'Enter' && e.shiftKey) {
+			e.preventDefault();
+			renderItems({random: false, add: true});
+		} else if(e.key === 'Enter') {
+			e.preventDefault();
+			renderItems();
+		} else if(e.ctrlKey && e.key === 'x') {
+			e.preventDefault();
+			resetFormAndClean();
+		}
+	})
+
 	SEARCH_BTN.addEventListener("click", () => renderItems());
-	RANDOM_BTN.addEventListener("click", () => renderItems(true));
-	CLEAR_BTN.addEventListener("click", clearSearchInput);
+	CLEAN_BTN.addEventListener("click", clearInput);
+	ADD_BTN.addEventListener("click", () => renderItems({random: false, add: true}));
+	RANDOM_BTN.addEventListener("click", () => renderItems({random: true}));
+	CLEAR_BTN.addEventListener("click", resetFormAndClean);
+
 	FORM.addEventListener("submit", (e) => {
 		e.preventDefault();
 		renderItems();

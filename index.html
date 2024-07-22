@@ -9,16 +9,25 @@
 <body>
     <header>
         <form id="pokemonForm">
-            <input 
-                type="text" 
-                name="searchValue" 
-                id="searchValue" 
-                value=""
-                placeholder="Search Pokémons"
-            >
-            <button type="button" id="search">Buscar</button>
-            <button type="button" id="random">Random</button>
-            <button type="button" id="clear">Limpiar</button>
+            <div class="inputWrapper">
+                <input 
+                    type="text" 
+                    name="searchValue" 
+                    id="searchValue" 
+                    value=""
+                    placeholder="Search Pokémons"
+                    autocomplete="off"
+                >
+    
+                <button type="button" id="clearButton" class="clearBtn">X</button>
+            </div>
+
+            <span class="buttonGroup">
+                <button type="button" id="search" class="primary">🔎 Buscar</button>
+                <button type="button" id="random" class="success">Random</button>
+                <button type="button" id="add" class="info">Agregar ➕</button>
+                <button type="button" id="clear" class="danger">✖️ Limpiar</button>
+            </span>
         </form>
     </header>
 
