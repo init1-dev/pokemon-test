@@ -1,0 +1,14 @@
+{
+  "name": "pokemon-test",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "browser-sync start --server --files 'css/*.css, js/*.js, *.html' --port 8080"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.7.0",
+    "browser-sync": "^3.0.2",
+    "eslint": "^9.7.0",
+    "eslint-plugin-node": "^11.1.0"
+  }
+}
