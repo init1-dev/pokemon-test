@@ -9,8 +9,10 @@ function getPokemon(id) {
 	return fetchData(url).then((data) => {
 		if (!data) return;
 		return {
+			id: data.id,
 			name: data.name,
-			img: data.sprites.front_default,
+			front: data.sprites.front_default,
+			shiny: data.sprites.front_shiny,
 			height: data.height,
 			weight: data.weight,
 			types: data.types,
@@ -107,18 +109,27 @@ function getPokemonMoves(pokemon) {
 function renderPokemon(pokemon) {
 	const List = document.getElementById("list");
 	const pokemonLi = document.createElement("li");
-	
+	console.log(pokemon);
 	pokemon.notFound
 		? (pokemonLi.innerHTML = `<h3>${pokemon.notFound}</h3>`)
 		: (pokemonLi.innerHTML = `
 			<div class="card">
-				<p><b>Name: </b>${pokemon.name}</p>
-				<img src="${pokemon.img}" />
-				<p><b>Height: </b>${pokemon.height}kg</p>
-				<p><b>Weight: </b>${pokemon.weight}cm</p>
-				<p><b>Types: </b> <span class="type ${'type'}">${pokemon.types.join(", ")}</span></p>
-				<p><b>Abilities: </b>${pokemon.abilities.join(", ")}</p>
-				<p><b>Moves: </b>${pokemon.moves.join(", ")}</p>
+				<div class="card-front">
+					<h2 class="stat-name"><b> #${pokemon.id} ${pokemon.name}</b></h2>
+					<span>Normal form:</span>
+					<img src="${pokemon.front}" alt="imagen de ${pokemon.name}"/>
+					<span>Shiny form:</span>
+					<img src="${pokemon.shiny}" alt="imagen de ${pokemon.name}"/>
+				</div>
+
+				<div class="card-back interactive">
+					<p><b>Name: </b>${pokemon.name}</p>
+					<p><b>Height: </b>${pokemon.height}kg</p>
+					<p><b>Weight: </b>${pokemon.weight}cm</p>
+					<p><b>Types: </b> <span class="type ${'type'}">${pokemon.types.join(", ")}</span></p>
+					<p><b>Abilities: </b>${pokemon.abilities.join(", ")}</p>
+					<p><b>Moves: </b>${pokemon.moves.join(", ")}</p>
+				</div>
 			<div>
 		`);
 	List.appendChild(pokemonLi);
@@ -199,6 +210,7 @@ function renderArrayItems(ids) {
 	Promise.all(pokemonPromises)
 		.then((pokemons) => {
 			pokemons.forEach((pokemon) => renderPokemon(pokemon));
+			cardEvents();
 			setLoading(false);
 		})
 		.catch((error) => {
@@ -243,6 +255,10 @@ function getCommaSeparatedValues(stringValues) {
  */
 
 function renderItems({random = false, add = false} = {}) {
+	let values = document.getElementById("searchValue").value;
+
+	if(!random && !values.length > 0) return;
+	
 	toggleExplain();
 	setLoading(true);
 
@@ -254,15 +270,9 @@ function renderItems({random = false, add = false} = {}) {
 		const randomIds = getRandomNumber(1, 1302, 4);
 		return renderArrayItems(randomIds);
 	}
-
-	let values = document.getElementById("searchValue").value;
 	
-	if(values) {
-		let splittedValues = getCommaSeparatedValues(values);
-		renderArrayItems(splittedValues);
-	} else {
-		setLoading(false);
-	}
+	let splittedValues = getCommaSeparatedValues(values);
+	renderArrayItems(splittedValues);
 };
 
 /**
@@ -274,7 +284,7 @@ function resetFormAndClean() {
 	form.reset();
 	toggleClearButton();
 	clearLastResults();
-	toggleExplain();
+	toggleExplain(true);
 };
 
 /**
@@ -312,11 +322,60 @@ function clearInput() {
  * alterna entre la explicacion y la lista de resultados
  */
 
-function toggleExplain() {
+function toggleExplain(reset = false) {
 	const RESULTS = document.getElementById('results');
 	const EXPLAIN = document.getElementById('explain');
-	RESULTS.classList.toggle('hidden');
-	EXPLAIN.classList.toggle('hidden');
+
+	if(reset){
+		RESULTS.classList.add('hidden');
+		EXPLAIN.classList.remove('hidden');
+	} else {
+		RESULTS.classList.remove('hidden');
+		EXPLAIN.classList.add('hidden');
+	}
+};
+
+/**
+ * eventos de las cartas
+ */
+
+function cardEvents() {
+	const card = document.querySelectorAll('.card');
+
+	card.forEach((card) => {
+		card.addEventListener('mousemove', function(e) {
+			if (!card.classList.contains('flipped')) {
+				const xAxis = (card.clientWidth / 2 - e.offsetX) / 10;
+				const yAxis = (card.clientHeight / 2 - e.offsetY) / 10;
+				card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+			}
+		});
+	
+		card.addEventListener('mouseenter', function() {
+			if (!card.classList.contains('flipped')) {
+				card.style.transition = 'none';
+			}
+		});
+	
+		card.addEventListener('mouseleave', function() {
+			if (!card.classList.contains('flipped')) {
+				card.style.transition = 'transform 0.8s';
+				card.style.transform = 'rotateY(0deg) rotateX(0deg)';
+			}
+		});
+	
+		// Rotacion
+		card.addEventListener('click', function() {
+			card.classList.toggle('flipped');
+			if (card.classList.contains('flipped')) {
+				card.style.transition = 'transform 0.8s';
+				card.style.transform = 'rotateY(180deg)';
+			} else {
+				card.style.transition = 'transform 0.8s';
+				card.style.transform = 'rotateY(0deg)';
+			}
+		});
+	})
 };
 
 /**

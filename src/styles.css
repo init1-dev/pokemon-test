@@ -5,27 +5,12 @@ body {
 }
 
 section {
-    padding: 1rem 1rem
+    padding: 1rem 1rem 2.5rem 1rem;
 }
 
 header {
     background-color: grey;
     padding: 0.5rem 1rem;
-}
-
-#list {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(1, 1fr);
-    margin-top: 1rem;
-
-    @media(min-width: 750px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media(min-width: 1400px) {
-        grid-template-columns: repeat(4, 1fr);
-    }
 }
 
 li {
@@ -41,12 +26,6 @@ li {
             list-style: circle;
         }
     }
-}
-
-.card {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background-color: grey;
 }
 
 .loader {
@@ -196,4 +175,86 @@ form#pokemonForm button {
     100% {
         transform: translate(200%)
     }
+}
+
+/* NEW POKEMON CARDS */
+
+.cards-container {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    grid-template-columns: repeat(1, 1fr);
+    margin-top: 1rem;
+
+    @media(min-width: 750px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media(min-width: 1400px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.card {
+    width: 300px;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease-out;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.card * {
+    pointer-events: none;
+}
+
+.card .interactive {
+    pointer-events: all;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+.card-front {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.card-front img {
+    margin: auto;
+    object-fit: cover;
+}
+
+.card-back {
+    background-color: lightgray;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: rotateY(180deg);
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.stat-name {
+    text-transform: capitalize;
 }
